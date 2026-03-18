@@ -1,31 +1,37 @@
 import requests
 
-API_URL = "https://api.coindesk.com/v1/bpi/currentprice.json"
+BTC_API = "https://api.coinbase.com/v2/prices/spot?currency=USD"
+TIME_API = "http://worldtimeapi.org/api/timezone/Etc/UTC"
 
 
-def fetch_bitcoin_price():
+def fetch_data():
     try:
-        response = requests.get(API_URL, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+        btc_res = requests.get(BTC_API, timeout=10)
+        time_res = requests.get(TIME_API, timeout=10)
 
-        usd_price = data["bpi"]["USD"]["rate"]
-        updated_time = data["time"]["updated"]
+        btc_res.raise_for_status()
+        time_res.raise_for_status()
 
-        print("\nBitcoin Price Dashboard")
-        print("-----------------------")
-        print(f"Updated: {updated_time}")
-        print(f"BTC Price (USD): {usd_price}")
+        btc_data = btc_res.json()
+        time_data = time_res.json()
+
+        btc_price = btc_data["data"]["amount"]
+        current_time = time_data["datetime"]
+
+        print("\n=== API DASHBOARD ===")
+        print("----------------------")
+        print(f"Time (UTC): {current_time}")
+        print(f"Bitcoin Price (USD): {btc_price}")
 
     except requests.exceptions.RequestException as e:
-        print("\nBitcoin Price Dashboard")
-        print("-----------------------")
-        print("Could not reach the API (network/DNS issue).")
+        print("\n=== API DASHBOARD ===")
+        print("----------------------")
+        print("Network/API error occurred")
         print(f"Error: {e}")
 
 
 def main():
-    fetch_bitcoin_price()
+    fetch_data()
 
 
 if __name__ == "__main__":
